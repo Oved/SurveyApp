@@ -1,13 +1,21 @@
-package com.example.surveyapp;
+package com.example.surveyapp.view.splash;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+
+import com.example.surveyapp.R;
+import com.example.surveyapp.view.MainActivity;
 
 public class ActivitySplash extends AppCompatActivity {
 
@@ -23,9 +31,11 @@ public class ActivitySplash extends AppCompatActivity {
 
         imageSplash.setAnimation(animation);
 
-        new Handler().postDelayed(() -> {
+        new Handler().postDelayed(this::goToMain, 3000);
+    }
+
+    public void goToMain(){
             startActivity(new Intent(this, MainActivity.class));
             finish();
-        }, 3000);
     }
 }

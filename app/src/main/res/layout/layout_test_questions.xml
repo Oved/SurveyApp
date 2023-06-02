@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.StartSurvey">
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_title_survey"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:gravity="center"-->
+<!--        tools:text="Encuesta"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="22sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_subtitle_survey"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:gravity="center"-->
+<!--        tools:text="Caracterización de escuelas 2023"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="15sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/text_title_survey" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_dates_survey"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:gravity="center"-->
+<!--        android:textColor="#E31111"-->
+<!--        android:textSize="15sp"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/text_subtitle_survey"-->
+<!--        tools:text="Fecha inicio 30/05/2023 - Fecha fin 05/06/2023" />-->
+
+<!--    <ScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/buttonNext"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/text_dates_survey">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/text_title_survey">-->
+
+<!--            <EditText-->
+<!--                android:id="@+id/edittext_name"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="15dp"-->
+<!--                android:hint="Nombre del encuestado"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/text_title_survey" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/textview_question"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="15dp"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                android:text="1. Es docente en el sector rural?"-->
+<!--                android:textColor="@color/black"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/edittext_name" />-->
+
+<!--            <RadioGroup-->
+<!--                android:id="@+id/radioGroupFirst"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginHorizontal="15dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+<!--                <RadioButton-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Si" />-->
+
+<!--                <RadioButton-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="No" />-->
+
+
+<!--            </RadioGroup>-->
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/ly_questions"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                android:visibility="visible">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/textview_question"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:text="2. Rango de edad?"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/edittext_nit" />-->
+
+<!--                <RadioGroup-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="18-25" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="26-35" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="36-45" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="46-55" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="56 o más" />-->
+
+
+<!--                </RadioGroup>-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/textview_question"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:text="3. Genero?"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/edittext_nit" />-->
+
+<!--                <RadioGroup-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Masculino" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Femenino" />-->
+
+
+<!--                </RadioGroup>-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/textview_question"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:text="4. Qué tipo de piso tiene la institución?"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/edittext_nit" />-->
+
+<!--                <RadioGroup-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Piso en baldosa" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Piso en cemento" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Piso en cemento fino" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Piso en cemento rustico" />-->
+
+<!--                    <RadioButton-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Piso en tierra" />-->
+
+<!--                </RadioGroup>-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:text="5. Seleccione con cuál de los siguientes herramientas didácticas cuenta la institución? "-->
+<!--                    android:textColor="@color/black"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/edittext_nit" />-->
+
+<!--                <RadioGroup-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+<!--                    <CheckBox-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Tablero" />-->
+
+<!--                    <CheckBox-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Televisión" />-->
+
+<!--                    <CheckBox-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Video-Beam" />-->
+
+<!--                    <CheckBox-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Libros" />-->
+
+<!--                </RadioGroup>-->
+
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginHorizontal="15dp"-->
+<!--                    android:layout_marginTop="15dp"-->
+<!--                    android:text="6. Califique el estado de la herramientas didácticas con las que cuenta la institución?"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/edittext_nit" />-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/text_title_survey">-->
+
+<!--                    <RadioGroup-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="15dp"-->
+<!--                        android:layout_marginBottom="20dp"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginEnd="20dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:text="Tablero"-->
+<!--                            android:textColor="@color/black" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="1" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="2" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="3" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="4" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="5" />-->
+
+
+<!--                    </RadioGroup>-->
+
+<!--                    <RadioGroup-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="15dp"-->
+<!--                        android:layout_marginBottom="20dp"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginEnd="20dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:text="Televisión"-->
+<!--                            android:textColor="@color/black" />-->
+
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="1" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="2" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="3" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="4" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="5" />-->
+
+<!--                    </RadioGroup>-->
+
+<!--                    <RadioGroup-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="15dp"-->
+<!--                        android:layout_marginBottom="20dp"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginEnd="20dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:text="Video-Beam"-->
+<!--                            android:textColor="@color/black" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="1" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="2" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="3" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="4" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="5" />-->
+
+
+<!--                    </RadioGroup>-->
+
+<!--                    <RadioGroup-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginHorizontal="15dp"-->
+<!--                        android:layout_marginBottom="20dp"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/textview_question">-->
+
+
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginEnd="20dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:text="Libros"-->
+<!--                            android:textColor="@color/black" />-->
+
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="1" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="2" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="3" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="4" />-->
+
+<!--                        <RadioButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="5" />-->
+
+
+<!--                    </RadioGroup>-->
+<!--                </LinearLayout>-->
+<!--            </LinearLayout>-->
+
+
+<!--        </LinearLayout>-->
+<!--    </ScrollView>-->
+
+<!--    <Button-->
+<!--        android:id="@+id/buttonNext"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:backgroundTint="#FFC107"-->
+<!--        android:elevation="54dp"-->
+<!--        android:text="Siguiente"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        tools:ignore="HardcodedText" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
