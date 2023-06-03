@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/layout_main"
     tools:context=".view.MainActivity">
 
     <Button
@@ -22,7 +22,7 @@
         android:id="@+id/title_init"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:text="Survey"
         android:textColor="#1C1515"
         android:textSize="50sp"
@@ -51,9 +51,9 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="10dp"
         android:text="Personas mayores de 18 años de todos los niveles socioeconómicos, residentes en el casco rural de la ciudad de El Carmen."
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="italic"
-        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_universe" />
@@ -78,8 +78,8 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="10dp"
         android:text="Medir el estado de las instalaciones en las escuelas rurales en El Carmen."
-        android:textSize="20sp"
         android:textColor="@color/black"
+        android:textSize="20sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,12 +89,26 @@
         android:id="@+id/button_start_survey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#FFC107"
         android:text="Iniciar encuesta"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/button_send_surveys"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_subtitle_objective"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/button_send_surveys"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#4CAF50"
+        android:text="Enviar encuestas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/button_start_survey"
         tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

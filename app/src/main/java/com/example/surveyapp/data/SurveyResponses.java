@@ -7,6 +7,25 @@ public class SurveyResponses {
     private String surveyCode;
     private String date;
     private List<QuestionAndAnswer> questionAndAnswersList;
+    private String pollsterCode;
+
+    public String getNumberSurvey() {
+        return numberSurvey;
+    }
+
+    public void setNumberSurvey(String numberSurvey) {
+        this.numberSurvey = numberSurvey;
+    }
+
+    private String numberSurvey;
+
+    public String getPollsterCode() {
+        return pollsterCode;
+    }
+
+    public void setPollsterCode(String pollsterCode) {
+        this.pollsterCode = pollsterCode;
+    }
 
     public String getRespondentName() {
         return respondentName;

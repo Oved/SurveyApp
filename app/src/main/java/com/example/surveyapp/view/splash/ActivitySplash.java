@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,7 +16,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.example.surveyapp.R;
+import com.example.surveyapp.utils.Tools;
 import com.example.surveyapp.view.MainActivity;
+
+import java.util.UUID;
 
 public class ActivitySplash extends AppCompatActivity {
 
@@ -26,6 +30,9 @@ public class ActivitySplash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         imageSplash = findViewById(R.id.imageSplash);
+
+        if (Tools.getCodeAlpha(this).isEmpty())
+            Tools.generateAlphanumericCode(this);
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.move_bottom);
 
