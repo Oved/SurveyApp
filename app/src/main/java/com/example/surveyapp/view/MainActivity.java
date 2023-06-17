@@ -1,46 +1,38 @@
 package com.example.surveyapp.view;
 
-import static android.provider.ContactsContract.CommonDataKinds.Event.START_DATE;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.surveyapp.R;
 import com.example.surveyapp.data.DataSVY;
+import com.example.surveyapp.interfaces.insertSurveysMySql.MainPresenter;
+import com.example.surveyapp.interfaces.insertSurveysMySql.MainView;
+import com.example.surveyapp.presenter.MainPresenterImpl;
 import com.example.surveyapp.utils.Tools;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainView {
 
     private Button buttonSettings, buttonStartSurvey, buttonSendSurvey;
     private ConstraintLayout layoutMain;
+    private ProgressBar progress;
 
     private String currentDate;
     private SimpleDateFormat dateFormat;
+    private MainPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         Tools.permission(this);
+        presenter = new MainPresenterImpl(this, this);
     }
 
     @Override
@@ -58,11 +51,12 @@ public class MainActivity extends AppCompatActivity {
         if (Tools.getSaveSurveys(this) != null)
             buttonSendSurvey.setVisibility(View.VISIBLE);
         else
-            buttonSendSurvey.setVisibility(View.GONE);
+            buttonSendSurvey.setVisibility(View.VISIBLE); //TODO cambiar a gone
     }
 
     private void initView() {
         layoutMain = findViewById(R.id.layout_main);
+        progress = findViewById(R.id.progress);
         buttonSettings = findViewById(R.id.button_settings);
         buttonStartSurvey = findViewById(R.id.button_start_survey);
         buttonSendSurvey = findViewById(R.id.button_send_surveys);
@@ -84,19 +78,10 @@ public class MainActivity extends AppCompatActivity {
         currentDate = dateFormat.format(date);
 
         buttonSendSurvey.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            ScrollView scrollView = new ScrollView(MainActivity.this);
-            LinearLayout linearLayout = new LinearLayout(MainActivity.this);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setPadding(40, 40, 40, 40);
-            TextView textView1 = new TextView(MainActivity.this);
-            textView1.setText(Tools.getSaveSurveysInJson(this));
-            linearLayout.addView(textView1);
-            scrollView.addView(linearLayout);
-            builder.setView(scrollView);
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            if (Tools.getSavedAnswers(this) !=  null)
+                presenter.insertSurveysInDB();
+            else
+                Tools.showSnackBar("No tienes encuestas guardadas", layoutMain,this);
         });
     }
 
@@ -133,5 +118,26 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public void showSuccess() {
+        Toast.makeText(this, "Insertada", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(String message) {
+        Tools.showSnackBar(message,layoutMain,this);
+    }
+
+
+    @Override
+    public void showProgress() {
+        progress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progress.setVisibility(View.GONE);
     }
 }

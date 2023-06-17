@@ -10,8 +10,8 @@ import com.example.surveyapp.data.DataQTS;
 import com.example.surveyapp.data.DataRES;
 import com.example.surveyapp.data.DataSVY;
 import com.example.surveyapp.data.DataTPE;
-import com.example.surveyapp.interfaces.iSearchDataModel;
-import com.example.surveyapp.interfaces.iSearchPresenter;
+import com.example.surveyapp.interfaces.searchSurvey.iSearchDataModel;
+import com.example.surveyapp.interfaces.searchSurvey.iSearchPresenter;
 import com.example.surveyapp.interfaces.iService;
 import com.example.surveyapp.utils.Tools;
 
@@ -76,7 +76,6 @@ public class SearchDataModel implements iSearchDataModel {
                 if (response.isSuccessful()) {
                     List<DataQTS> data = response.body();
                     Tools.saveDataQTS(data, context);
-//                    presenter.showData(data.get(0).getDescqts());
                     searchSurveyRES(codeSurvey);
 
                 } else {
@@ -118,23 +117,16 @@ public class SearchDataModel implements iSearchDataModel {
         service.getSurveyESC("dataesc","%").enqueue(new Callback<List<DataESC>>() {
             @Override
             public void onResponse(Call<List<DataESC>> call, Response<List<DataESC>> response) {
-                presenter.hideProgress();
                 if (response.isSuccessful()) {
                     List<DataESC> data = response.body();
                     Tools.saveDataESC(data, context);
+                    saveImages();
                     presenter.showSnackbar("Encuesta guarda de manera exitosa");
-
-//
-//                    presenter.showData(
-//                            Tools.getDataSVY(context).get(0).makeJson()+"\n\n"+
-//                            Tools.getDataQTS(context).get(0).makeJson()+"\n\n"+
-//                            Tools.getDataRES(context).get(0).makeJson()+"\n\n"+
-//                            Tools.getDataESC(context).get(0).makeJson()
-//                    );
 
                 } else {
                     Log.e("ERROR", "onFailure: ");
                 }
+                presenter.hideProgress();
             }
 
             @Override
@@ -142,6 +134,15 @@ public class SearchDataModel implements iSearchDataModel {
                 presenter.hideProgress();
             }
         });
+    }
+
+    private void saveImages() {
+        if (Tools.getDataRES(context)!=null) {
+            for (DataRES res : Tools.getDataRES(context)) {
+                if (!res.getFotores().isEmpty())
+                    Tools.savePicture(context, res.getFotores(), res.getDescres()+res.getSeqnqts());
+            }
+        }
     }
 
     private void searchSurveyTPE() {

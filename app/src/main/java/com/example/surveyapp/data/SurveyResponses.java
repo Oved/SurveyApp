@@ -6,8 +6,8 @@ public class SurveyResponses {
     private String respondentName;
     private String surveyCode;
     private String date;
-    private List<QuestionAndAnswer> questionAndAnswersList;
     private String pollsterCode;
+    private List<QuestionAndAnswer> questionAndAnswersList;
 
     public String getNumberSurvey() {
         return numberSurvey;

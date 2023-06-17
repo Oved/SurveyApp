@@ -2,10 +2,10 @@ package com.example.surveyapp.presenter;
 
 import android.content.Context;
 
-import com.example.surveyapp.interfaces.iSearchPresenter;
+import com.example.surveyapp.interfaces.searchSurvey.iSearchPresenter;
 import com.example.surveyapp.model.SearchDataModel;
-import com.example.surveyapp.interfaces.iSearchDataModel;
-import com.example.surveyapp.interfaces.iMainActivity;
+import com.example.surveyapp.interfaces.searchSurvey.iSearchDataModel;
+import com.example.surveyapp.interfaces.searchSurvey.iMainActivity;
 
 public class SearchPresenter implements iSearchPresenter {
 
@@ -34,7 +34,7 @@ public class SearchPresenter implements iSearchPresenter {
 
     @Override
     public void hideProgress() {
-        view.hideProgres();
+        view.hideProgress();
     }
 
     @Override

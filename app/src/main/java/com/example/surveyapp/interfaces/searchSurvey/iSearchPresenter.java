@@ -1,4 +1,4 @@
-package com.example.surveyapp.interfaces;
+package com.example.surveyapp.interfaces.searchSurvey;
 
 public interface iSearchPresenter {
 

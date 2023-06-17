@@ -28,26 +28,33 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <LinearLayout
+        android:id="@+id/linear_"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="50dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/etSurveyNumber">
 
         <Button
-            android:id="@+id/button_delete"
-            android:layout_width="wrap_content"
+            android:id="@+id/button_save"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
-            android:text="Borrar" />
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="10dp"
+            android:text="Descargar encuesta" />
 
         <Button
-            android:id="@+id/button_save"
-            android:layout_width="wrap_content"
+            android:id="@+id/button_delete"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cargar" />
+            android:gravity="center"
+            android:backgroundTint="#DF0A0A"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="5dp"
+            android:layout_marginTop="10dp"
+            android:text="Eliminar encuesta descargada" />
 
     </LinearLayout>
 

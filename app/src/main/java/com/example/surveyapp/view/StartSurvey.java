@@ -8,9 +8,15 @@ import androidx.core.view.ViewCompat;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -26,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.surveyapp.R;
+import com.example.surveyapp.data.Answers;
 import com.example.surveyapp.data.DataESC;
 import com.example.surveyapp.data.DataQTS;
 import com.example.surveyapp.data.DataRES;
@@ -33,8 +40,10 @@ import com.example.surveyapp.data.DataSVY;
 import com.example.surveyapp.data.DataTPE;
 import com.example.surveyapp.data.QuestionAndAnswer;
 import com.example.surveyapp.data.SurveyResponses;
+import com.example.surveyapp.utils.MyLocation;
 import com.example.surveyapp.utils.Tools;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +51,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class StartSurvey extends AppCompatActivity {
+public class StartSurvey extends AppCompatActivity{
 
     private TextView tvNameRespondent;
     private Button buttonNext;
@@ -56,6 +65,9 @@ public class StartSurvey extends AppCompatActivity {
     private List<CardView> cardViewList;
     private List<CheckBox> listChecks = new ArrayList<>();
     private boolean isAnswered = false;
+    private double latitude;
+    private double longitude;
+    private String timestamp ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,15 +152,30 @@ public class StartSurvey extends AppCompatActivity {
                     String radioGroupId = "layoutCheck_qts_" + question.getSeqnqts();
                     layoutCheckBox.setTag(radioGroupId);
 
+                    TextView considerationText = new TextView(this);
+                    considerationText.setText("Seleccione la opción teniendo en cuenta a 1 como Malo y 5 como Excelente");
+                    considerationText.setTextColor(getResources().getColor(R.color.purple_700));
+                    layoutCheckBox.addView(considerationText);
 
+                    //TODO: creo que no lo uso
                     LinearLayout linearGrid = new LinearLayout(this);
                     linearGrid.setLayoutParams(new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
                     ));
-                    linearGrid.setOrientation(LinearLayout.VERTICAL);
-                    linearGrid.setPadding(16, 16, 16, 16);
+                    linearGrid.setGravity(Gravity.END);
+                    for (int cond =1; cond<=5; cond++){
+                        TextView textViewCondition = new TextView(this);
+                        textViewCondition.setText(String.valueOf(cond));
+                        textViewCondition.setPadding(26,0,26,0);
+                        textViewCondition.setTextColor(getResources().getColor(R.color.teal_700));
+                        linearGrid.addView(textViewCondition);
+                    }
+
+                    linearGrid.setOrientation(LinearLayout.HORIZONTAL);
                     linearGrid.setTag("id_linear_grid_" + question.getSeqnqts());
+
+                    layoutCheckBox.addView(linearGrid);
 
                     for (DataRES answer : dataRESList) {
                         if (answer.getSeqnqts().equals(question.getSeqnqts())) {
@@ -162,8 +189,9 @@ public class StartSurvey extends AppCompatActivity {
                             TextView textViewAnswerGrid = new TextView(this);
                             textViewAnswerGrid.setTextColor(getResources().getColor(R.color.black));
                             textViewAnswerGrid.setLayoutParams(new LinearLayout.LayoutParams(
-                                    150,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                    0,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    1
                             ));
                             textViewAnswerGrid.setText(answer.getDescres());
                             String tagTVGrid = "id_text_answer_grid_" + answer.getOrdnres();
@@ -174,8 +202,9 @@ public class StartSurvey extends AppCompatActivity {
 
                             RadioGroup radioGroupGrid = new RadioGroup(this);
                             radioGroupGrid.setLayoutParams(new LinearLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                    0,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    1
                             ));
                             radioGroupGrid.setOrientation(LinearLayout.HORIZONTAL);
                             String idRadioGroupGrid = "id_radio_group_grid_" + answer.getOrdnres();
@@ -227,10 +256,20 @@ public class StartSurvey extends AppCompatActivity {
                                                 }
                                             });
                                 } else {
+
                                     checkBox.setWidth(350);
                                     checkBox.setHeight(350);
-                                    Drawable drawable = getResources().getDrawable(R.drawable.splash);
-                                    drawable.setBounds(0, 0, 100, 100);
+                                    Drawable drawable;
+                                        File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                                        String name = options.getDescres() + options.getSeqnqts();
+                                        File imageFile = new File(directory, name + ".png");
+                                        Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                                        if (bitmap==null)
+                                            drawable = getResources().getDrawable(R.drawable.no_image);
+                                        else
+                                            drawable = new BitmapDrawable(getResources(), bitmap);
+
+                                    drawable.setBounds(0, 0, 350, 350);
                                     checkBox.setCompoundDrawables(drawable, null, null, null);
                                 }
                             }
@@ -302,24 +341,18 @@ public class StartSurvey extends AppCompatActivity {
                                 nextQuestions();
                                 break;
                             } else {
-                                SurveyResponses surveyResponses = new SurveyResponses();
-                                surveyResponses.setRespondentName(tvNameRespondent.getText().toString());
-                                SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
-                                surveyResponses.setDate(format.format(new Date()));
-                                surveyResponses.setPollsterCode(Tools.getCodeAlpha(this));
-                                surveyResponses.setSurveyCode(dataQTSList.get(i).getCodesvy());
-                                List<QuestionAndAnswer> questionAndAnswersList = new ArrayList<>();
+
                                 String tagButton = selectedRadioButton.getTag().toString();
-                                questionAndAnswersList.add(new QuestionAndAnswer(
-                                        dataQTSList.get(i).getSeqnqts(),
-                                        dataQTSList.get(i).getDescqts(),
-                                        tagButton.substring(tagButton.length() - 2),
-                                        selectedRadioButton.getText().toString()));
-                                surveyResponses.setQuestionAndAnswersList(questionAndAnswersList);
-                                Tools.saveSurvey(surveyResponses, this);
-                                Toast.makeText(this, "Encuesta guardada", Toast.LENGTH_SHORT).show();
-                                finish();
+                                List<QuestionAndAnswer> questionAnsResponse = new ArrayList<>();
+                                QuestionAndAnswer questionAndAnswer = new QuestionAndAnswer();
+                                questionAndAnswer.setQuestionCode(dataQTSList.get(i).getSeqnqts());
+                                questionAndAnswer.setAnswerCode(tagButton.substring(tagButton.length() - 2));
+                                questionAndAnswer.setAnswerDescription(selectedRadioButton.getText().toString());
+                                questionAndAnswer.setTipQuestion(dataQTSList.get(i).getTiprqts());
+                                questionAnsResponse.add(questionAndAnswer);
+                                saveSurvey(questionAnsResponse);
                                 break;
+
                             }
                         } else {
                             Toast.makeText(this, "Selecciona una respuesta para continuar o finalizar la encuesta", Toast.LENGTH_SHORT).show();
@@ -503,19 +536,22 @@ public class StartSurvey extends AppCompatActivity {
                     String tagRB = radioButtonSelected.getTag().toString();
                     String ordAnswer = tagRB.substring(tagRB.length() - 2);
 
-                    questionAndAnswersList.add(new QuestionAndAnswer(
-                            dataQTSList.get(i).getSeqnqts(),
-                            dataQTSList.get(i).getDescqts(),
-                            ordAnswer,
-                            radioButtonSelected.getText().toString()
-                    ));
+                    QuestionAndAnswer answer = new QuestionAndAnswer();
+                    answer.setQuestionCode(dataQTSList.get(i).getSeqnqts());
+                    answer.setAnswerDescription(radioButtonSelected.getText().toString());
+                    answer.setTipQuestion("U");
+                    answer.setAnswerDescription(radioButtonSelected.getText().toString());
+                    answer.setAnswerCode(ordAnswer);
+                    questionAndAnswersList.add(answer);
 
                 }
 
                 if (dataQTSList.get(i).getTiprqts().toUpperCase(Locale.ROOT).equals("M")) {
 
                     LinearLayout layoutCheckBox = (LinearLayout) cardViewList.get(i).getChildAt(0);
-
+                    QuestionAndAnswer answer = new QuestionAndAnswer();
+                    answer.setQuestionCode(dataQTSList.get(i).getSeqnqts());
+                    answer.setTipQuestion("M");
                     if (dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("CA")) {
 
                         LinearLayout linearContainingRadioGroup = new LinearLayout(this);
@@ -540,7 +576,6 @@ public class StartSurvey extends AppCompatActivity {
                             }
                         }
 
-                        String response = "";
                         String ordAnswer = "";
                         for (RadioGroup radioGroupGrid : radioGroupList) {
                             int selectedRadioButtonId = radioGroupGrid.getCheckedRadioButtonId();
@@ -550,19 +585,51 @@ public class StartSurvey extends AppCompatActivity {
                                 break loop;
                             } else {
                                 RadioButton radioButton = findViewById(selectedRadioButtonId);
-                                response = radioButton.getText().toString();
+                                String tagRadioGroup = radioGroupGrid.getTag().toString();
                                 String tag = radioButton.getTag().toString();
-                                ordAnswer = tag.substring(tag.length() - 2);
+                                String rta = tag.substring(tag.length()-1);
+                                switch (rta) {
+                                    case "1":
+                                        rta = "Pésimo";
+                                        break;
+                                    case "2":
+                                        rta = "Malo";
+                                        break;
+                                    case "3":
+                                        rta = "Regular";
+                                        break;
+                                    case "4":
+                                        rta = "Bueno";
+                                        break;
+                                    case "5":
+                                        rta = "Excelente";
+                                        break;
+                                }
+                                ordAnswer = tagRadioGroup.substring(tagRadioGroup.length() - 2);
+                                switch (ordAnswer) {
+                                    case "01":
+                                        answer.setAnswer01(rta);
+                                        break;
+                                    case "02":
+                                        answer.setAnswer02(rta);
+                                        break;
+                                    case "03":
+                                        answer.setAnswer03(rta);
+                                        break;
+                                    case "04":
+                                        answer.setAnswer04(rta);
+                                        break;
+                                    case "05":
+                                        answer.setAnswer05(rta);
+                                        break;
+                                    case "06":
+                                        answer.setAnswer06(rta);
+                                        break;
+                                }
                             }
                         }
-
-
-                        questionAndAnswersList.add(new QuestionAndAnswer(
-                                dataQTSList.get(i).getSeqnqts(),
-                                dataQTSList.get(i).getDescqts(),
-                                ordAnswer,
-                                response
-                        ));
+                        //answer.setAnswerCode(ordAnswer);
+                        questionAndAnswersList.add(answer);
 
                     } else {
 
@@ -591,8 +658,31 @@ public class StartSurvey extends AppCompatActivity {
                         for (int ind = 0; ind < linearChecks.getChildCount(); ind++) {
                             if (linearChecks.getChildAt(ind) instanceof CheckBox) {
                                 if (((CheckBox) linearChecks.getChildAt(ind)).isChecked()) {
-//                                    ordAnswer = ordAnswer + " / " + ((CheckBox) linearChecks.getTag(ind)).toString().substring(layoutCheckBox.getTag(ind).toString().length() - 2);
+                                    String tag = ((CheckBox) linearChecks.getChildAt(ind)).getTag().toString();
+                                    ordAnswer = tag.substring(tag.length() - 2);
+                                    switch (ordAnswer) {
+                                        case "01":
+                                            answer.setAnswer01(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "02":
+                                            answer.setAnswer02(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "03":
+                                            answer.setAnswer03(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "04":
+                                            answer.setAnswer04(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "05":
+                                            answer.setAnswer05(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "06":
+                                            answer.setAnswer06(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                    }
+
                                     response = response + " / " + ((CheckBox) linearChecks.getChildAt(ind)).getText().toString();
+
                                     checkBoxListAnswerSelected.add((CheckBox) linearChecks.getChildAt(ind));
                                 }
                             }
@@ -604,12 +694,9 @@ public class StartSurvey extends AppCompatActivity {
                             break;
                         }
 
-                        questionAndAnswersList.add(new QuestionAndAnswer(
-                                dataQTSList.get(i).getSeqnqts(),
-                                dataQTSList.get(i).getDescqts(),
-                                ordAnswer,
-                                response
-                        ));
+                        //questionAndAnswersList.add(new QuestionAndAnswer(dataQTSList.get(i).getSeqnqts(),dataQTSList.get(i).getDescqts(),ordAnswer,response));
+
+                        questionAndAnswersList.add(answer);
                     }
                 }
             }
@@ -621,27 +708,74 @@ public class StartSurvey extends AppCompatActivity {
 
     private void saveSurvey(List<QuestionAndAnswer> questionAndAnswersList) {
 
+        Location location = MyLocation.getRecipientLocation(this);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date currentDate = new Date();
+        String formattedTimestamp = sdf.format(currentDate).replace('-',' ').replace(':',' ');
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.timestamp = formattedTimestamp.replaceAll("\\s+", "");;
+
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Guardando encuesta...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
         progressDialog.show();
-        new Handler().postDelayed((Runnable) () -> {
+        new Handler().postDelayed(() -> {
+            String numberSurvey = String.valueOf(Tools.generateCodeSurvey(this));
+            List<Answers> answersList = new ArrayList<>();
+            Answers answer = new Answers();
+            answer.setCodesvy(dataSVYList.get(0).getCodesvy());
+            answer.setSeqnqts("00");  //TODO secuencia de la pregunta
+            answer.setSeqnrpt(numberSurvey); //TODO secuencia de número de encuesta, va aumentando
+            answer.setEncurpt(tvNameRespondent.getText().toString());
+            answer.setCodecel(Tools.getCodeAlpha(this));
+            answer.setRpt01(String.valueOf(this.latitude));
+            answer.setRpt02(String.valueOf(this.longitude));
+            answer.setRpt03(this.timestamp);
 
-            SurveyResponses surveyResponses = new SurveyResponses();
-            surveyResponses.setRespondentName(tvNameRespondent.getText().toString());
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
-            surveyResponses.setDate(format.format(new Date()));
-            surveyResponses.setSurveyCode(String.valueOf(Tools.generateCodeSurvey(this)));
-            surveyResponses.setPollsterCode(Tools.getCodeAlpha(this));
-            surveyResponses.setSurveyCode(dataSVYList.get(0).getCodesvy());
-            surveyResponses.setQuestionAndAnswersList(questionAndAnswersList);
-            Tools.saveSurvey(surveyResponses, this);
+            answersList.add(answer);
 
+            for (QuestionAndAnswer questionAndAnswer : questionAndAnswersList) {
+                Answers responses = new Answers();
+                responses.setCodesvy(dataSVYList.get(0).getCodesvy());
+                responses.setSeqnqts(questionAndAnswer.getQuestionCode());  //TODO secuencia de la pregunta
+                responses.setSeqnrpt(numberSurvey); //TODO secuencia de número de encuesta, va aumentando
+                responses.setEncurpt(tvNameRespondent.getText().toString());
+                responses.setCodecel(Tools.getCodeAlpha(this));
+
+                if (questionAndAnswer.getTipQuestion().equals("M")) {
+                    responses.setRpt01(questionAndAnswer.getAnswer01());
+                    responses.setRpt02(questionAndAnswer.getAnswer02());
+                    responses.setRpt03(questionAndAnswer.getAnswer03());
+                    responses.setRpt04(questionAndAnswer.getAnswer04());
+                    responses.setRpt05(questionAndAnswer.getAnswer05());
+                    responses.setRpt06(questionAndAnswer.getAnswer06());
+                    responses.setRpt07(questionAndAnswer.getAnswer07());
+                    responses.setRpt08(questionAndAnswer.getAnswer08());
+                    responses.setRpt09(questionAndAnswer.getAnswer09());
+                    responses.setRpt10(questionAndAnswer.getAnswer10());
+                    responses.setRpt11(questionAndAnswer.getAnswer11());
+                    responses.setRpt12(questionAndAnswer.getAnswer12());
+                    responses.setRpt13(questionAndAnswer.getAnswer13());
+                    responses.setRpt14(questionAndAnswer.getAnswer14());
+                    responses.setRpt15(questionAndAnswer.getAnswer15());
+                    responses.setRpt16(questionAndAnswer.getAnswer16());
+                    responses.setRpt17(questionAndAnswer.getAnswer17());
+                    responses.setRpt18(questionAndAnswer.getAnswer18());
+                    responses.setRpt19(questionAndAnswer.getAnswer19());
+                    responses.setRpt20(questionAndAnswer.getAnswer20());
+                } else {
+                    responses.setRpt01(questionAndAnswer.getAnswerDescription());
+                }
+                answersList.add(responses);
+            }
+
+            Tools.saveAnswers(answersList, this);
             progressDialog.dismiss();
             finish();
-        }, 3000);
+        }, 2000);
     }
 
     private void addView() {
