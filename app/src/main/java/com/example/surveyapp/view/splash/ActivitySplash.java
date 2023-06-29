@@ -33,6 +33,10 @@ public class ActivitySplash extends AppCompatActivity {
 
         if (Tools.getCodeAlpha(this).isEmpty())
             Tools.generateAlphanumericCode(this);
+        if (Tools.isNetworkAvailable(this) && Tools.arePermissionsGrantedLocation(this)) {
+            if (Tools.checkLocationEnabled(this))
+                Tools.saveLocation(this);
+        }
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.move_bottom);
 

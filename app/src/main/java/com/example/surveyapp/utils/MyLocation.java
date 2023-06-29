@@ -29,9 +29,9 @@ public class MyLocation {
 
         // Comprobar si hay conexión a Internet disponible
         if (Tools.isNetworkAvailable(context)) {
-            // Obtener la ubicación actual
+            // Obtener la ubicación actual utilizando el proveedor de red
             try {
-                Location currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                Location currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 if (currentLocation != null) {
                     return currentLocation;
                 }

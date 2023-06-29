@@ -53,14 +53,15 @@ public class SearchDataModel implements iSearchDataModel {
                         searchSurveyQTS(search);
 
                     } else {
+                        presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                         Log.e("ERROR", "onFailure: ");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<List<DataSVY>> call, Throwable t) {
+                    presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                     presenter.hideProgress();
-                    Log.e("ERROR", "onFailure: ");
                 }
             });
         }else {
@@ -79,12 +80,14 @@ public class SearchDataModel implements iSearchDataModel {
                     searchSurveyRES(codeSurvey);
 
                 } else {
+                    presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                     Log.e("ERROR", "onFailure: ");
                 }
             }
 
             @Override
             public void onFailure(Call<List<DataQTS>> call, Throwable t) {
+                presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                 presenter.hideProgress();
             }
         });
@@ -101,12 +104,14 @@ public class SearchDataModel implements iSearchDataModel {
                     searchSurveyESC();
 
                 } else {
+                    presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                     Log.e("ERROR", "onFailure: ");
                 }
             }
 
             @Override
             public void onFailure(Call<List<DataRES>> call, Throwable t) {
+                presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                 presenter.hideProgress();
             }
         });
@@ -124,6 +129,7 @@ public class SearchDataModel implements iSearchDataModel {
                     presenter.showSnackbar("Encuesta guarda de manera exitosa");
 
                 } else {
+                    presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                     Log.e("ERROR", "onFailure: ");
                 }
                 presenter.hideProgress();
@@ -131,16 +137,21 @@ public class SearchDataModel implements iSearchDataModel {
 
             @Override
             public void onFailure(Call<List<DataESC>> call, Throwable t) {
+                presenter.showSnackbar("Se obtuvo un error al obtener la encuesta, revisa el código");
                 presenter.hideProgress();
             }
         });
     }
 
     private void saveImages() {
-        if (Tools.getDataRES(context)!=null) {
-            for (DataRES res : Tools.getDataRES(context)) {
-                if (!res.getFotores().isEmpty())
-                    Tools.savePicture(context, res.getFotores(), res.getDescres()+res.getSeqnqts());
+        List<DataRES> resList = Tools.getDataRES(context);
+        if (resList!=null) {
+            for (DataRES res : resList) {
+                if (!res.getFotores().isEmpty()) {
+                    String[] parts = res.getFotores().split("/");
+                    String name = parts[parts.length - 1];
+                    Tools.savePicture(context, res.getFotores(), name);
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ public class DataSVY {
 
     private String codesvy;
     private String namesvy;
+    private String univsvy;
     private String objesvy;
     private String datesvy;
     private String dinisvy;
@@ -25,6 +26,14 @@ public class DataSVY {
 
     public void setNamesvy(String namesvy) {
         this.namesvy = namesvy;
+    }
+
+    public String getUnivsvy() {
+        return univsvy;
+    }
+
+    public void setUnivsvy(String univsvy) {
+        this.univsvy = univsvy;
     }
 
     public String getObjesvy() {

@@ -3,20 +3,27 @@ package com.example.surveyapp.utils;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -56,6 +63,7 @@ public class Tools {
     private static String KEY_DATATPE = "key_datatpe";
     private static String KEY_DATAESC = "key_dataesc";
     private static String KEY_SURVEYS = "key_surveys";
+    private static String KEY_USER_NAME = "key_user_name";
 
     private static String KEY_SURVEY_NUMBER = "key_survey_number";
 
@@ -67,9 +75,11 @@ public class Tools {
     private static String SP_DATATPE = "sp_datatpe";
     private static String SP_DATAESC = "sp_dataesc";
     private static String SP_SURVEYS = "sp_surveys";
+    private static String SP_USER_NAME = "sp_user_name";
+    private static String SP_LOCATION = "sp_location";
 
     private static String SP_SURVEY_NUMBER = "sp_survey_number";
-    private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int REQUEST_PERMISSIONS = 1;
 
     public static String[] permissions = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -77,7 +87,40 @@ public class Tools {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
+    public static String[] permissionsLocation = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+    };
 
+    public static void setLatitude(Context ctx, String latitude){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_LOCATION, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("latitude", latitude);
+        editor.apply();
+    }
+    public static String getLatitude(Context ctx){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_LOCATION, Context.MODE_PRIVATE);
+        return settings.getString("latitude", "0");
+    }
+    public static void setLongitude(Context ctx, String longitude){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_LOCATION, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("longitude", longitude);
+        editor.apply();
+
+    }
+    public static String getLongitude(Context ctx){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_LOCATION, Context.MODE_PRIVATE);
+        return settings.getString("longitude", "0");
+    }
+
+    public static void saveLocation(Context ctx) {
+        Location actualLocation = MyLocation.getRecipientLocation(ctx);
+        if (actualLocation!=null) {
+            setLatitude(ctx, String.valueOf(actualLocation.getLatitude()));
+            setLongitude(ctx, String.valueOf(actualLocation.getLongitude()));
+        }
+    }
 
     public static void generateAlphanumericCode(Context ctx) {
         SharedPreferences settings = ctx.getSharedPreferences(SP_CODE_ALPHA, Context.MODE_PRIVATE);
@@ -336,7 +379,7 @@ public class Tools {
 
         // Si hay permisos que no han sido otorgados, solicitarlos al usuario
         if (!permissionList.isEmpty()) {
-            ActivityCompat.requestPermissions(ctx, permissionList.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(ctx, permissionList.toArray(new String[0]), REQUEST_PERMISSIONS);
         } else {
             // Los permisos ya han sido otorgados, realizar las acciones necesarias
             // ...
@@ -347,7 +390,24 @@ public class Tools {
         for (String permission : permissions) {
             int permissionStatus = ContextCompat.checkSelfPermission(context, permission);
             if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-                // El permiso no está otorgado
+                Toast.makeText(context, "Verifica el permiso de almacenamiento o localización", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        // Todos los permisos están otorgados
+        return true;
+    }
+
+    public static boolean permissionMEDIA_IMAGESGranted(Context context) {
+        int permissionStatus = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES);
+        return (permissionStatus == PackageManager.PERMISSION_GRANTED);
+    }
+
+    public static boolean arePermissionsGrantedLocation(Context context) {
+        for (String permission : permissionsLocation) {
+            int permissionStatus = ContextCompat.checkSelfPermission(context, permission);
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(context, "Debes otorgar el permiso de localización", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
@@ -375,12 +435,14 @@ public class Tools {
     public static void savePicture(Context context, String imageUrl, String name) {
         int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_WRITE_EXTERNAL_STORAGE);
-            return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions((Activity) context,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_WRITE_EXTERNAL_STORAGE);
+                return;
+            }
         }
 
         new Thread(() -> {
@@ -395,7 +457,8 @@ public class Tools {
                 InputStream input = connection.getInputStream();
 
                 File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                File imageFile = new File(directory, name + ".png");
+                File imageFile = new File(directory, name);
+                //File imageFile = new File(directory, name + ".png");
 
                 if (!directory.exists()) {
                     directory.mkdirs();
@@ -462,6 +525,48 @@ public class Tools {
             }.getType();
             return gson.fromJson(json_listSVY, listType);
         }
+    }
+
+    public static void clearAnswers(Context ctx) {
+        SharedPreferences settings = ctx.getSharedPreferences(SP_SURVEYS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove(KEY_SURVEYS); // Eliminar la clave correspondiente a las respuestas
+        editor.apply();
+    }
+
+    public static void userName(String name, Context ctx){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_USER_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(KEY_USER_NAME, name);
+        editor.apply();
+    }
+
+    public static String getUserName(Context ctx){
+        SharedPreferences settings = ctx.getSharedPreferences(SP_USER_NAME, Context.MODE_PRIVATE);
+        return settings.getString(KEY_USER_NAME,"");
+    }
+
+    public static boolean checkLocationEnabled(Activity activity) {
+        LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        boolean isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!isLocationEnabled) {
+            // La ubicación está desactivada, mostrar un diálogo para solicitar al usuario que la active
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+            dialogBuilder.setMessage("La ubicación está desactivada. ¿Desea activarla?")
+                    .setCancelable(false)
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        // Abrir la configuración de ubicación del dispositivo
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        activity.startActivity(intent);
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.cancel());
+
+            AlertDialog alertDialog = dialogBuilder.create();
+            alertDialog.show();
+        }
+        return isLocationEnabled;
     }
 
 }

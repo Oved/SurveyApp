@@ -1,12 +1,19 @@
 package com.example.surveyapp.view;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.surveyapp.R;
 import com.example.surveyapp.presenter.SearchPresenter;
@@ -40,7 +48,20 @@ public class InsertSurveyNumber extends AppCompatActivity implements iMainActivi
         presenter = new SearchPresenter(this, this);
         loadView();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(!Tools.permissionMEDIA_IMAGESGranted(this))
+                request_permission_launcher().launch(Manifest.permission.READ_MEDIA_IMAGES);
+        }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Tools.isNetworkAvailable(this) && Tools.arePermissionsGrantedLocation(this)) {
+            if (Tools.checkLocationEnabled(this))
+                Tools.saveLocation(this);
+        }
     }
 
     private void loadView() {
@@ -59,6 +80,7 @@ public class InsertSurveyNumber extends AppCompatActivity implements iMainActivi
             progressDialog.show();
             new Handler().postDelayed((Runnable) () -> {
                 Tools.deleteAllSurveys(this);
+                Tools.clearAnswers(this);
                 progressDialog.dismiss();
 
             }, 1500);
@@ -107,5 +129,22 @@ public class InsertSurveyNumber extends AppCompatActivity implements iMainActivi
     @Override
     public void showSnackbar(String message) {
         Tools.showSnackBar(message,layoutMain,this);
+    }
+
+    private ActivityResultLauncher<String> request_permission_launcher(){
+        return registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (!isGranted) {
+                        Toast.makeText(this, "Otorga el permiso de almacenamiento", Toast.LENGTH_SHORT).show();
+                        new Handler().postDelayed(this::goSettings,1500);
+                    }
+                });
+    }
+
+    private void goSettings(){
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 }

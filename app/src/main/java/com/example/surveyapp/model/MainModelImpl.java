@@ -39,8 +39,7 @@ public class MainModelImpl implements MainModel {
         retrofit = getRetrofit();
     }
 
-    List<Answers> data;
-    boolean flag = false;
+    boolean isSent = true;
 
     @Override
     public void insertSurveys() {
@@ -48,9 +47,9 @@ public class MainModelImpl implements MainModel {
             presenter.showProgress();
 
             iService service = retrofit.create(iService.class);
-            data = Tools.getSavedAnswers(context);
-            for (Answers answers : Tools.getSavedAnswers(context)) {
 
+            for (Answers answers : Tools.getSavedAnswers(context)) {
+                isSent = true;
                 service.insertData(answers.getTip(), answers.getCodesvy(), answers.getSeqnqts(), answers.getSeqnrpt(),
                                 answers.getEncurpt(), answers.getCodecel(), answers.getRpt01(), answers.getRpt02(), answers.getRpt03(),
                                 answers.getRpt04(), answers.getRpt05(), answers.getRpt06(), answers.getRpt07(), answers.getRpt08(), answers.getRpt09(),
@@ -62,9 +61,10 @@ public class MainModelImpl implements MainModel {
                                 presenter.hideProgress();
                                 if (response.isSuccessful()) {
                                     ResponseObject data = response.body().get(0);
-                                    if (data.getSAVE().equals("1"))
-                                        flag = true;
+                                    if (!data.getSAVE().equals("1"))
+                                        isSent = false;
                                 } else {
+                                    isSent = false;
                                     presenter.showError(response.message());
                                 }
                             }
@@ -72,11 +72,12 @@ public class MainModelImpl implements MainModel {
                             @Override
                             public void onFailure(Call<List<ResponseObject>> call, Throwable t) {
                                 presenter.hideProgress();
+                                isSent = false;
                                 presenter.showError(t.getMessage());
                             }
                         });
             }
-            if (flag)
+            if (isSent)
                 presenter.showSuccess();
             else
                 presenter.showError("Parece que hubo problemas al insertar los datos");

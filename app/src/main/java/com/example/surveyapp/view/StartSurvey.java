@@ -4,15 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.ViewCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -22,9 +27,11 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +68,9 @@ public class StartSurvey extends AppCompatActivity{
     private List<DataQTS> dataQTSList;
     private List<DataRES> dataRESList;
     private List<DataESC> dataESCList;
+    private List<DataESC> listCA;
+    private List<DataESC> listFV;
+    private List<DataESC> listVT;
     private List<DataTPE> dataTPEList;
     private List<CardView> cardViewList;
     private List<CheckBox> listChecks = new ArrayList<>();
@@ -77,6 +87,20 @@ public class StartSurvey extends AppCompatActivity{
         getSurveyLists();
         setDataInit();
         insertQuestions();
+        if (Tools.isNetworkAvailable(this)) {
+            requestLocation();
+        } else {
+            latitude = Double.parseDouble(Tools.getLatitude(this));
+            longitude = Double.parseDouble(Tools.getLongitude(this));
+        }
+    }
+
+    private void requestLocation() {
+        Location actualLocation = MyLocation.getRecipientLocation(this);
+        if (actualLocation!=null) {
+            latitude = actualLocation.getLatitude();
+            longitude = actualLocation.getLongitude();
+        }
     }
 
     private void insertQuestions() {
@@ -121,7 +145,7 @@ public class StartSurvey extends AppCompatActivity{
                         ViewGroup.LayoutParams.WRAP_CONTENT
                 ));
                 String radioGroupId = "radioGroup_qts_" + question.getSeqnqts();
-                radioGroup.setId(ViewCompat.generateViewId());
+                //radioGroup.setId(ViewCompat.generateViewId());
                 radioGroup.setTag(radioGroupId);
                 for (DataRES options : dataRESList) {
                     if (options.getSeqnqts().equals(question.getSeqnqts())) {
@@ -134,6 +158,8 @@ public class StartSurvey extends AppCompatActivity{
                         String radioButtonId = "radioButton_qts_" + question.getSeqnqts() + options.getOrdnres();
                         radioButton.setId(ViewCompat.generateViewId());
                         radioButton.setTag(radioButtonId);
+                        if (!question.getDepnqts().isEmpty())
+                            radioButton.setVisibility(View.GONE);
                         radioGroup.addView(radioButton);
                     }
                 }
@@ -146,28 +172,43 @@ public class StartSurvey extends AppCompatActivity{
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                 ));
-                if (question.getCodetpe().toUpperCase(Locale.ROOT).equals("CA")) {
+                if (question.getCodetpe().toUpperCase(Locale.ROOT).equals("CA")
+                        || question.getCodetpe().toUpperCase(Locale.ROOT).equals("FV")
+                        || question.getCodetpe().toUpperCase(Locale.ROOT).equals("VT")) {
+
+                    int items = 5;
+                    switch (question.getCodetpe()) {
+                        case "CA":
+                            items = listCA.size();
+                            break;
+                        case "FV":
+                            items = listFV.size();
+                            break;
+                        case "VT":
+                            items = listVT.size();
+                            break;
+                    }
 
                     layoutCheckBox.setOrientation(LinearLayout.VERTICAL);
                     String radioGroupId = "layoutCheck_qts_" + question.getSeqnqts();
                     layoutCheckBox.setTag(radioGroupId);
 
-                    TextView considerationText = new TextView(this);
-                    considerationText.setText("Seleccione la opción teniendo en cuenta a 1 como Malo y 5 como Excelente");
-                    considerationText.setTextColor(getResources().getColor(R.color.purple_700));
-                    layoutCheckBox.addView(considerationText);
+                    //TextView considerationText = new TextView(this); TODO texto de considerando 1 como malo...
+                    //considerationText.setText("Seleccione la opción teniendo en cuenta a 1 como Malo y 5 como Excelente");
+                    //considerationText.setTextColor(getResources().getColor(R.color.purple_700));
+                    //layoutCheckBox.addView(considerationText);
 
                     //TODO: creo que no lo uso
                     LinearLayout linearGrid = new LinearLayout(this);
                     linearGrid.setLayoutParams(new LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
                     ));
-                    linearGrid.setGravity(Gravity.END);
-                    for (int cond =1; cond<=5; cond++){
+                    //linearGrid.setGravity(Gravity.END);
+                    for (int cond =1; cond<=1; cond++){
                         TextView textViewCondition = new TextView(this);
-                        textViewCondition.setText(String.valueOf(cond));
-                        textViewCondition.setPadding(26,0,26,0);
+                        textViewCondition.setText("Sabiendo que 1 = Muy desfavorable, 2 = Desfavorable, 3 = Neutro, 4 = Muy favorable.");
+                        textViewCondition.setPadding(26,10,26,10);
                         textViewCondition.setTextColor(getResources().getColor(R.color.teal_700));
                         linearGrid.addView(textViewCondition);
                     }
@@ -175,14 +216,14 @@ public class StartSurvey extends AppCompatActivity{
                     linearGrid.setOrientation(LinearLayout.HORIZONTAL);
                     linearGrid.setTag("id_linear_grid_" + question.getSeqnqts());
 
-                    layoutCheckBox.addView(linearGrid);
+                    //layoutCheckBox.addView(linearGrid);
 
                     for (DataRES answer : dataRESList) {
                         if (answer.getSeqnqts().equals(question.getSeqnqts())) {
                             LinearLayout linearAnswerGrid = new LinearLayout(this);
                             linearAnswerGrid.setLayoutParams(new LinearLayout.LayoutParams(
                                     ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                                    140
                             ));
                             linearAnswerGrid.setOrientation(LinearLayout.HORIZONTAL);
                             linearAnswerGrid.setTag("id_linear_grid_answers_" + answer.getOrdnres());
@@ -191,7 +232,7 @@ public class StartSurvey extends AppCompatActivity{
                             textViewAnswerGrid.setLayoutParams(new LinearLayout.LayoutParams(
                                     0,
                                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                                    1
+                                    2
                             ));
                             textViewAnswerGrid.setText(answer.getDescres());
                             String tagTVGrid = "id_text_answer_grid_" + answer.getOrdnres();
@@ -204,13 +245,13 @@ public class StartSurvey extends AppCompatActivity{
                             radioGroupGrid.setLayoutParams(new LinearLayout.LayoutParams(
                                     0,
                                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                                    1
+                                    6
                             ));
                             radioGroupGrid.setOrientation(LinearLayout.HORIZONTAL);
                             String idRadioGroupGrid = "id_radio_group_grid_" + answer.getOrdnres();
                             radioGroupGrid.setTag(idRadioGroupGrid);
 
-                            for (int ind = 1; ind <= 5; ind++) {
+                            for (int ind = 1; ind <= items; ind++) {
                                 RadioButton radioButton = new RadioButton(this);
                                 radioButton.setLayoutParams(new ViewGroup.LayoutParams(
                                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -218,6 +259,12 @@ public class StartSurvey extends AppCompatActivity{
                                 ));
                                 String radioButtonId = "id_button_answer_grid_" + ind;
                                 radioButton.setTag(radioButtonId);
+                                if (question.getCodetpe().equals("CA"))
+                                    radioButton.setText(String.valueOf(ind));
+                                if (question.getCodetpe().equals("FV"))
+                                    radioButton.setText(String.valueOf(ind));
+                                if (question.getCodetpe().equals("VT"))
+                                    radioButton.setText(listVT.get(ind - 1).getDescesc());
                                 radioGroupGrid.addView(radioButton);
                             }
                             linearAnswerGrid.addView(radioGroupGrid);
@@ -257,12 +304,13 @@ public class StartSurvey extends AppCompatActivity{
                                             });
                                 } else {
 
-                                    checkBox.setWidth(350);
-                                    checkBox.setHeight(350);
+                                    //checkBox.setWidth(350);
+                                    //checkBox.setHeight(350);
                                     Drawable drawable;
                                         File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                                        String name = options.getDescres() + options.getSeqnqts();
-                                        File imageFile = new File(directory, name + ".png");
+                                        String[] parts = (options.getFotores().isEmpty()) ? "No/File/00".split("/"):options.getFotores().split("/");
+                                        String nameImg = parts[parts.length - 1];
+                                        File imageFile = new File(directory, nameImg);
                                         Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
                                         if (bitmap==null)
                                             drawable = getResources().getDrawable(R.drawable.no_image);
@@ -284,7 +332,15 @@ public class StartSurvey extends AppCompatActivity{
                         }
                     }
                 }
-                cardContent.addView(layoutCheckBox);
+
+                HorizontalScrollView horizontalScrollView = new HorizontalScrollView(this);
+                horizontalScrollView.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                ));
+                horizontalScrollView.setHorizontalScrollBarEnabled(true);
+                horizontalScrollView.addView(layoutCheckBox);
+                cardContent.addView(horizontalScrollView);
             }
 
             // Agregar el LinearLayout del contenido al CardView
@@ -473,7 +529,6 @@ public class StartSurvey extends AppCompatActivity{
                                 }
                             }
 
-
                             for (LinearLayout linearAnswerGrid : listLinearGrid) {
                                 for (DataRES answer : dataRESList) {
                                     for (int i = 0; i < linearAnswerGrid.getChildCount(); i++) {
@@ -499,6 +554,28 @@ public class StartSurvey extends AppCompatActivity{
                                                     linearAnswerGrid.setAlpha(0.5f);
                                                 }
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            String tagRG= "radioGroup_qts_" + qts.getSeqnqts();
+                            RadioGroup radioGroupQTSUnique = layoutContainer.findViewWithTag(tagRG);
+
+                            for (DataRES answer : dataRESList) {
+                                if (radioGroupQTSUnique != null) {
+                                    for (int rbQTS = 0; rbQTS < radioGroupQTSUnique.getChildCount(); rbQTS++) {
+                                        RadioButton radioButton = (RadioButton) radioGroupQTSUnique.getChildAt(rbQTS);
+                                        String tagCheck = check.getTag().toString();
+                                        if (tagCheck.substring(tagCheck.length() - 2).equals(answer.getOrdnres())) {
+                                            if (check.getText().equals(radioButton.getText().toString()))
+                                                radioButton.setVisibility(View.VISIBLE);
+                                            if (radioButton.getText().toString().equals("No Sabe / No Responde"))
+                                                radioButton.setVisibility(View.VISIBLE);
+                                            if (radioButton.getText().toString().equals("Ninguno"))
+                                                radioButton.setVisibility(View.VISIBLE);
+                                            if (radioButton.getText().toString().equals("Voto en blanco"))
+                                                radioButton.setVisibility(View.VISIBLE);
                                         }
                                     }
                                 }
@@ -552,12 +629,21 @@ public class StartSurvey extends AppCompatActivity{
                     QuestionAndAnswer answer = new QuestionAndAnswer();
                     answer.setQuestionCode(dataQTSList.get(i).getSeqnqts());
                     answer.setTipQuestion("M");
-                    if (dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("CA")) {
+                    if (dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("CA")
+                            || dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("FV")
+                            || dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("VT")) {
 
                         LinearLayout linearContainingRadioGroup = new LinearLayout(this);
                         for (int ly = 0; ly < layoutCheckBox.getChildCount(); ly++) {
                             if (layoutCheckBox.getChildAt(ly) instanceof LinearLayout)
                                 linearContainingRadioGroup = (LinearLayout) layoutCheckBox.getChildAt(ly);
+                            if (layoutCheckBox.getChildAt(ly) instanceof HorizontalScrollView) {
+                                HorizontalScrollView horizontalScrollView = (HorizontalScrollView) layoutCheckBox.getChildAt(ly);
+                                for (int indScroll = 0; indScroll < horizontalScrollView.getChildCount(); indScroll++) {
+                                    if (horizontalScrollView.getChildAt(indScroll) instanceof LinearLayout)
+                                        linearContainingRadioGroup = (LinearLayout) horizontalScrollView.getChildAt(indScroll);
+                                }
+                            }
                         }
 
                         List<LinearLayout> linearAnswerList = new ArrayList<>();
@@ -590,19 +676,54 @@ public class StartSurvey extends AppCompatActivity{
                                 String rta = tag.substring(tag.length()-1);
                                 switch (rta) {
                                     case "1":
-                                        rta = "Pésimo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("CA"))
+                                            rta = "Pésimo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("FV"))
+                                            rta = "Muy desfavorable";
+                                        if (dataQTSList.get(i).getCodetpe().equals("VT"))
+                                            rta = "Sí votaría";
+                                        if (dataQTSList.get(i).getCodetpe().equals("SN"))
+                                            rta = "Si";
                                         break;
                                     case "2":
-                                        rta = "Malo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("CA"))
+                                            rta = "Malo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("FV"))
+                                            rta = "Desfavorable";
+                                        if (dataQTSList.get(i).getCodetpe().equals("VT"))
+                                            rta = "No votaría";
+                                        if (dataQTSList.get(i).getCodetpe().equals("SN"))
+                                            rta = "No";
                                         break;
                                     case "3":
-                                        rta = "Regular";
+                                        if (dataQTSList.get(i).getCodetpe().equals("CA"))
+                                            rta = "Regular";
+                                        if (dataQTSList.get(i).getCodetpe().equals("FV"))
+                                            rta = "Neutral";
+                                        if (dataQTSList.get(i).getCodetpe().equals("VT"))
+                                            rta = "";
+                                        if (dataQTSList.get(i).getCodetpe().equals("SN"))
+                                            rta = "";
                                         break;
                                     case "4":
-                                        rta = "Bueno";
+                                        if (dataQTSList.get(i).getCodetpe().equals("CA"))
+                                            rta = "Bueno";
+                                        if (dataQTSList.get(i).getCodetpe().equals("FV"))
+                                            rta = "Favorable";
+                                        if (dataQTSList.get(i).getCodetpe().equals("VT"))
+                                            rta = "";
+                                        if (dataQTSList.get(i).getCodetpe().equals("SN"))
+                                            rta = "";
                                         break;
                                     case "5":
-                                        rta = "Excelente";
+                                        if (dataQTSList.get(i).getCodetpe().equals("CA"))
+                                            rta = "Excelente";
+                                        if (dataQTSList.get(i).getCodetpe().equals("FV"))
+                                            rta = "Muy favorable";
+                                        if (dataQTSList.get(i).getCodetpe().equals("VT"))
+                                            rta = "";
+                                        if (dataQTSList.get(i).getCodetpe().equals("SN"))
+                                            rta = "";
                                         break;
                                 }
                                 ordAnswer = tagRadioGroup.substring(tagRadioGroup.length() - 2);
@@ -624,6 +745,48 @@ public class StartSurvey extends AppCompatActivity{
                                         break;
                                     case "06":
                                         answer.setAnswer06(rta);
+                                        break;
+                                    case "07":
+                                        answer.setAnswer07(rta);
+                                        break;
+                                    case "08":
+                                        answer.setAnswer08(rta);
+                                        break;
+                                    case "09":
+                                        answer.setAnswer09(rta);
+                                        break;
+                                    case "10":
+                                        answer.setAnswer10(rta);
+                                        break;
+                                    case "11":
+                                        answer.setAnswer11(rta);
+                                        break;
+                                    case "12":
+                                        answer.setAnswer12(rta);
+                                        break;
+                                    case "13":
+                                        answer.setAnswer13(rta);
+                                        break;
+                                    case "14":
+                                        answer.setAnswer14(rta);
+                                        break;
+                                    case "15":
+                                        answer.setAnswer15(rta);
+                                        break;
+                                    case "16":
+                                        answer.setAnswer16(rta);
+                                        break;
+                                    case "17":
+                                        answer.setAnswer17(rta);
+                                        break;
+                                    case "18":
+                                        answer.setAnswer18(rta);
+                                        break;
+                                    case "19":
+                                        answer.setAnswer19(rta);
+                                        break;
+                                    case "20":
+                                        answer.setAnswer20(rta);
                                         break;
                                 }
                             }
@@ -652,6 +815,14 @@ public class StartSurvey extends AppCompatActivity{
                             if (layoutCheckBox.getChildAt(ind) instanceof LinearLayout) {
                                 linearChecks = ((LinearLayout) layoutCheckBox.getChildAt(ind));
                             }
+                            if(layoutCheckBox.getChildAt(ind) instanceof HorizontalScrollView){
+                                HorizontalScrollView horizontalScrollView = (HorizontalScrollView) layoutCheckBox.getChildAt(ind);
+                                for (int t = 0; t < horizontalScrollView.getChildCount(); t++) {
+                                    if (horizontalScrollView.getChildAt(t) instanceof LinearLayout) {
+                                        linearChecks = ((LinearLayout) horizontalScrollView.getChildAt(t));
+                                    }
+                                }
+                            }
                         }
 
                         List<CheckBox> checkBoxListAnswerSelected = new ArrayList<>();
@@ -678,6 +849,48 @@ public class StartSurvey extends AppCompatActivity{
                                             break;
                                         case "06":
                                             answer.setAnswer06(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "07":
+                                            answer.setAnswer07(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "08":
+                                            answer.setAnswer08(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "09":
+                                            answer.setAnswer09(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "10":
+                                            answer.setAnswer10(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "11":
+                                            answer.setAnswer11(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "12":
+                                            answer.setAnswer12(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "13":
+                                            answer.setAnswer13(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "14":
+                                            answer.setAnswer14(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "15":
+                                            answer.setAnswer15(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "16":
+                                            answer.setAnswer16(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "17":
+                                            answer.setAnswer17(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "18":
+                                            answer.setAnswer18(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "19":
+                                            answer.setAnswer19(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
+                                            break;
+                                        case "20":
+                                            answer.setAnswer20(((CheckBox) linearChecks.getChildAt(ind)).getText().toString());
                                             break;
                                     }
 
@@ -708,13 +921,10 @@ public class StartSurvey extends AppCompatActivity{
 
     private void saveSurvey(List<QuestionAndAnswer> questionAndAnswersList) {
 
-        Location location = MyLocation.getRecipientLocation(this);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date currentDate = new Date();
         String formattedTimestamp = sdf.format(currentDate).replace('-',' ').replace(':',' ');
-        this.latitude = location.getLatitude();
-        this.longitude = location.getLongitude();
-        this.timestamp = formattedTimestamp.replaceAll("\\s+", "");;
+        this.timestamp = formattedTimestamp.replaceAll("\\s+", "");
 
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Guardando encuesta...");
@@ -771,7 +981,7 @@ public class StartSurvey extends AppCompatActivity{
                 }
                 answersList.add(responses);
             }
-
+            Tools.userName(tvNameRespondent.getText().toString(),this);
             Tools.saveAnswers(answersList, this);
             progressDialog.dismiss();
             finish();
@@ -795,6 +1005,9 @@ public class StartSurvey extends AppCompatActivity{
         tvNameRespondent.setOnClickListener(c -> {
             tvNameRespondent.setCursorVisible(true);
         });
+        String name = Tools.getUserName(this);
+        tvNameRespondent.setText(name);
+
     }
 
     private void getSurveyLists() {
@@ -803,6 +1016,21 @@ public class StartSurvey extends AppCompatActivity{
         dataRESList = Tools.getDataRES(this);
         dataESCList = Tools.getDataESC(this);
         dataTPEList = Tools.getDataTPE(this);
+
+        listCA = new ArrayList<>();
+        listFV = new ArrayList<>();
+        listVT = new ArrayList<>();
+
+        for (DataESC dataESC : dataESCList) {
+            if (dataESC.getCodetpe().equals("CA"))
+                listCA.add(dataESC);
+
+            if (dataESC.getCodetpe().equals("FV"))
+                listFV.add(dataESC);
+
+            if (dataESC.getCodetpe().equals("VT"))
+                listVT.add(dataESC);
+        }
 
         Collections.sort(dataQTSList, (data1, data2) -> {
             String seqnqts1 = data1.getSeqnqts();
