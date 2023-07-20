@@ -27,7 +27,7 @@
         android:fontFamily="serif-monospace"
         android:textSize="50sp"
         android:textStyle="bold|italic"
-        app:layout_constraintBottom_toTopOf="@+id/text_universe"
+        app:layout_constraintBottom_toTopOf="@+id/text_name_survey"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_settings" />

@@ -71,6 +71,7 @@ public class StartSurvey extends AppCompatActivity{
     private List<DataESC> listCA;
     private List<DataESC> listFV;
     private List<DataESC> listVT;
+    private List<DataESC> listD3;
     private List<DataTPE> dataTPEList;
     private List<CardView> cardViewList;
     private List<CheckBox> listChecks = new ArrayList<>();
@@ -174,7 +175,8 @@ public class StartSurvey extends AppCompatActivity{
                 ));
                 if (question.getCodetpe().toUpperCase(Locale.ROOT).equals("CA")
                         || question.getCodetpe().toUpperCase(Locale.ROOT).equals("FV")
-                        || question.getCodetpe().toUpperCase(Locale.ROOT).equals("VT")) {
+                        || question.getCodetpe().toUpperCase(Locale.ROOT).equals("VT")
+                        || question.getCodetpe().toUpperCase(Locale.ROOT).equals("D3")) {
 
                     int items = 5;
                     switch (question.getCodetpe()) {
@@ -186,6 +188,9 @@ public class StartSurvey extends AppCompatActivity{
                             break;
                         case "VT":
                             items = listVT.size();
+                            break;
+                        case "D3":
+                            items = listD3.size();
                             break;
                     }
 
@@ -260,6 +265,8 @@ public class StartSurvey extends AppCompatActivity{
                                 String radioButtonId = "id_button_answer_grid_" + ind;
                                 radioButton.setTag(radioButtonId);
                                 if (question.getCodetpe().equals("CA"))
+                                    radioButton.setText(String.valueOf(ind));
+                                if (question.getCodetpe().equals("D3"))
                                     radioButton.setText(String.valueOf(ind));
                                 if (question.getCodetpe().equals("FV"))
                                     radioButton.setText(String.valueOf(ind));
@@ -630,6 +637,7 @@ public class StartSurvey extends AppCompatActivity{
                     answer.setQuestionCode(dataQTSList.get(i).getSeqnqts());
                     answer.setTipQuestion("M");
                     if (dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("CA")
+                            || dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("D3")
                             || dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("FV")
                             || dataQTSList.get(i).getCodetpe().toUpperCase(Locale.ROOT).equals("VT")) {
 
@@ -678,6 +686,8 @@ public class StartSurvey extends AppCompatActivity{
                                     case "1":
                                         if (dataQTSList.get(i).getCodetpe().equals("CA"))
                                             rta = "Pésimo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("D3"))
+                                            rta = "Mala";
                                         if (dataQTSList.get(i).getCodetpe().equals("FV"))
                                             rta = "Muy desfavorable";
                                         if (dataQTSList.get(i).getCodetpe().equals("VT"))
@@ -688,6 +698,8 @@ public class StartSurvey extends AppCompatActivity{
                                     case "2":
                                         if (dataQTSList.get(i).getCodetpe().equals("CA"))
                                             rta = "Malo";
+                                        if (dataQTSList.get(i).getCodetpe().equals("D3"))
+                                            rta = "Regular";
                                         if (dataQTSList.get(i).getCodetpe().equals("FV"))
                                             rta = "Desfavorable";
                                         if (dataQTSList.get(i).getCodetpe().equals("VT"))
@@ -698,6 +710,8 @@ public class StartSurvey extends AppCompatActivity{
                                     case "3":
                                         if (dataQTSList.get(i).getCodetpe().equals("CA"))
                                             rta = "Regular";
+                                        if (dataQTSList.get(i).getCodetpe().equals("D3"))
+                                            rta = "Buena";
                                         if (dataQTSList.get(i).getCodetpe().equals("FV"))
                                             rta = "Neutral";
                                         if (dataQTSList.get(i).getCodetpe().equals("VT"))
@@ -708,6 +722,8 @@ public class StartSurvey extends AppCompatActivity{
                                     case "4":
                                         if (dataQTSList.get(i).getCodetpe().equals("CA"))
                                             rta = "Bueno";
+                                        if (dataQTSList.get(i).getCodetpe().equals("D3"))
+                                            rta = "";
                                         if (dataQTSList.get(i).getCodetpe().equals("FV"))
                                             rta = "Favorable";
                                         if (dataQTSList.get(i).getCodetpe().equals("VT"))
@@ -718,6 +734,8 @@ public class StartSurvey extends AppCompatActivity{
                                     case "5":
                                         if (dataQTSList.get(i).getCodetpe().equals("CA"))
                                             rta = "Excelente";
+                                        if (dataQTSList.get(i).getCodetpe().equals("D3"))
+                                            rta = "";
                                         if (dataQTSList.get(i).getCodetpe().equals("FV"))
                                             rta = "Muy favorable";
                                         if (dataQTSList.get(i).getCodetpe().equals("VT"))
@@ -1020,6 +1038,7 @@ public class StartSurvey extends AppCompatActivity{
         listCA = new ArrayList<>();
         listFV = new ArrayList<>();
         listVT = new ArrayList<>();
+        listD3 = new ArrayList<>();
 
         for (DataESC dataESC : dataESCList) {
             if (dataESC.getCodetpe().equals("CA"))
@@ -1030,6 +1049,9 @@ public class StartSurvey extends AppCompatActivity{
 
             if (dataESC.getCodetpe().equals("VT"))
                 listVT.add(dataESC);
+
+            if (dataESC.getCodetpe().equals("D3"))
+                listD3.add(dataESC);
         }
 
         Collections.sort(dataQTSList, (data1, data2) -> {
